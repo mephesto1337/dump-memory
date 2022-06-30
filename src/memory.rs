@@ -131,7 +131,7 @@ pub struct Region {
     pub inode: u64,
 
     /// Backing file if any
-    pub file: Option<String>,
+    path: Option<String>,
 }
 
 impl FromStr for Region {
@@ -147,7 +147,7 @@ impl FromStr for Region {
         let offset = parts.next().ok_or(Error::MissingRegionField("offset"))?;
         let device = parts.next().ok_or(Error::MissingRegionField("device"))?;
         let inode = parts.next().ok_or(Error::MissingRegionField("inode"))?;
-        let file = parts.next().map(|f| f.to_owned());
+        let path = parts.next().map(|f| f.to_owned());
 
         let (start, end) =
             start_end
@@ -184,7 +184,7 @@ impl FromStr for Region {
             offset,
             dev,
             inode,
-            file,
+            path,
         })
     }
 }
@@ -226,13 +226,13 @@ impl Region {
     }
 
     pub fn filename(&self) -> Option<&str> {
-        self.file()
+        self.path()
             .map(|f| Path::new(f))
             .and_then(|p| p.file_name())
             .and_then(|os| os.to_str())
     }
-    pub fn file(&self) -> Option<&str> {
-        self.file.as_ref().map(|s| s.as_str())
+    pub fn path(&self) -> Option<&str> {
+        self.path.as_ref().map(|s| s.as_str())
     }
 }
 
@@ -279,7 +279,7 @@ mod tests {
                 minor: 0x01,
             },
             inode: 1462190,
-            file: Some("/usr/bin/nvim".into()),
+            path: Some("/usr/bin/nvim".into()),
         };
         let parsed_region = match region_with_file.parse::<Region>() {
             Ok(region) => region,
@@ -307,7 +307,7 @@ mod tests {
                 minor: 0x0,
             },
             inode: 0,
-            file: None,
+            path: None,
         };
         let parsed_region = match region_with_file.parse::<Region>() {
             Ok(region) => region,

@@ -45,7 +45,7 @@ fn main() -> Result<()> {
                 "Could not dump region {:x}-{:x} ({}): {}",
                 region.start,
                 region.end,
-                region.file().unwrap_or("no file"),
+                region.path().unwrap_or("no file"),
                 e
             );
             continue;
@@ -56,7 +56,7 @@ fn main() -> Result<()> {
             "Dumped region {:x}-{:x} ({})",
             region.start,
             region.end,
-            region.file().unwrap_or("no file")
+            region.path().unwrap_or("no file")
         );
     }
 
