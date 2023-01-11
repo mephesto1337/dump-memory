@@ -19,6 +19,9 @@ pub enum Error {
 
     /// Region not found
     RegionNotFound { start: usize, end: usize },
+
+    /// Ptrace error
+    Ptrace(io::Error),
 }
 
 pub type Result<T> = ::std::result::Result<T, Error>;
@@ -35,6 +38,7 @@ impl fmt::Display for Error {
             Self::RegionNotFound { start, end } => {
                 write!(f, "Region mapped with 0x{:x}..0x{:x} not found", start, end)
             }
+            Self::Ptrace(ref e) => write!(f, "ptrace error: {}", e),
         }
     }
 }

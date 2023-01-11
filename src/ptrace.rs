@@ -1,10 +1,8 @@
 use std::fs::File;
-use std::io;
-
-use std::io::{Read, Seek, SeekFrom};
+use std::io::{self, Read, Seek, SeekFrom};
 
 use crate::memory::Region;
-use crate::Result;
+use crate::{Error, Result};
 
 #[derive(Debug)]
 pub struct Ptrace {
@@ -17,12 +15,12 @@ extern "C" {
     fn __errno_location() -> *mut i32;
 }
 
-fn errno() -> io::Result<()> {
+fn ptrace_errno() -> Result<()> {
     let e = unsafe { *__errno_location() };
     if e == 0 {
         Ok(())
     } else {
-        Err(io::Error::from_raw_os_error(e))
+        Err(Error::Ptrace(io::Error::from_raw_os_error(e)))
     }
 }
 
@@ -30,7 +28,7 @@ fn ptrace_wrapper(req: i32, pid: u32, addr: usize, data: usize) -> Result<usize>
     let ret = unsafe { ptrace(req, pid, addr, data) };
 
     if ret == usize::MAX {
-        errno()?;
+        ptrace_errno()?;
     }
     Ok(ret)
 }
@@ -44,7 +42,7 @@ impl Ptrace {
         Ok(Self { pid, mem: None })
     }
 
-    fn open_mem(&mut self) -> io::Result<&mut File> {
+    fn open_mem(&mut self) -> Result<&mut File> {
         if self.mem.is_none() {
             let mem = File::open(format!("/proc/{}/mem", self.pid))?;
             self.mem = Some(mem);

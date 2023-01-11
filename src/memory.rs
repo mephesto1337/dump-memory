@@ -40,7 +40,7 @@ impl Permissions {
     }
 
     pub fn add(&mut self, pbit: PermissionBits) -> &mut Self {
-        self.0 = self.0 | pbit as u32;
+        self.0 |= pbit as u32;
         self
     }
 }
@@ -227,12 +227,12 @@ impl Region {
 
     pub fn filename(&self) -> Option<&str> {
         self.path()
-            .map(|f| Path::new(f))
+            .map(Path::new)
             .and_then(|p| p.file_name())
             .and_then(|os| os.to_str())
     }
     pub fn path(&self) -> Option<&str> {
-        self.path.as_ref().map(|s| s.as_str())
+        self.path.as_deref()
     }
 }
 
