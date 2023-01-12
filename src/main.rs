@@ -4,6 +4,9 @@ mod error;
 mod memory;
 mod ptrace;
 
+#[cfg(feature = "secrets")]
+mod memmem;
+
 pub use error::{Error, Result};
 
 use memory::Memory;
@@ -60,6 +63,15 @@ fn main() -> Result<()> {
             region.perms,
             region.path().unwrap_or("no file")
         );
+        #[cfg(feature = "secrets")]
+        {
+            let patterns = ["private", "secret", "password"];
+            for pattern in &patterns {
+                if let Some(idx) = memmem::search_no_case(&buffer[..], pattern.as_bytes()) {
+                    println!("Found pattern {} in {} at offset {}", pattern, &region, idx);
+                }
+            }
+        }
     }
 
     Ok(())
