@@ -42,9 +42,10 @@ fn main() -> Result<()> {
         buffer.clear();
         if let Err(e) = process.dump(region, &mut buffer) {
             eprintln!(
-                "Could not dump region {:x}-{:x} ({}): {}",
+                "Could not dump region {:x}-{:x} {} ({}): {}",
                 region.start,
                 region.end,
+                region.perms,
                 region.path().unwrap_or("no file"),
                 e
             );
@@ -53,9 +54,10 @@ fn main() -> Result<()> {
         let outfile = format!("{}", region);
         std::fs::write(output_dir.join(outfile), &buffer[..])?;
         println!(
-            "Dumped region {:x}-{:x} ({})",
+            "Dumped region {:x}-{:x} {} ({})",
             region.start,
             region.end,
+            region.perms,
             region.path().unwrap_or("no file")
         );
     }
