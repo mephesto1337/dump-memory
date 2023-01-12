@@ -12,8 +12,8 @@ use ptrace::Ptrace;
 fn get_program_name(pid: u32) -> Result<String> {
     let mut invocation = std::fs::read_to_string(format!("/proc/{}/cmdline", pid))?;
 
-    if let Some(nulbyte) = invocation.find('\0') {
-        invocation.truncate(nulbyte);
+    if let Some(nullbyte) = invocation.find('\0') {
+        invocation.truncate(nullbyte);
     }
 
     Ok(invocation)
